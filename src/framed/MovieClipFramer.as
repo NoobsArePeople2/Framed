@@ -3,8 +3,8 @@ package framed
 	import com.adobe.images.PNGEncoder;
 	
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
-	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.geom.Matrix;
@@ -16,7 +16,7 @@ package framed
 	import nochump.util.zip.ZipEntry;
 	import nochump.util.zip.ZipOutput;
 	
-	public class MovieClipFramer implements IFramer
+	public class MovieClipFramer
 	{
 		// Just export each frame at its individual size. Frames may be different size.
 		public static const TO_EACH_FRAME:String    = "toEachFrame";
@@ -24,25 +24,28 @@ package framed
 		// This ensures all frames are the same size.
 		public static const TO_LARGEST_FRAME:String = "toLargestFrame";
 		
-		private var theStage:Stage;
+		private var root:DisplayObject;
 		private var mc:MovieClip;
 		
 		private var widest:int = 0;
 		private var tallest:int = 0;
 		
-		public function MovieClipFramer(theStage:Stage, mc:MovieClip = null)
+		public function MovieClipFramer(root:DisplayObject, mc:MovieClip)
 		{
-			this.theStage = theStage;
-			this.mc = mc;
-		}
-		
-		public function setTarget(mc:MovieClip):void
-		{
+			this.root = root;
 			this.mc = mc;
 		}
 		
 		public function frame(fileName:String = 'data.zip', method:String = ''):void
 		{
+			var rootClip:MovieClip = root as MovieClip;
+			if (!rootClip)
+			{
+				trace("Nope.");
+				return;
+			}
+			rootClip.stop();
+			
 			if (method == '')
 			{
 				method = TO_LARGEST_FRAME;
@@ -68,7 +71,7 @@ package framed
 				bmd.fillRect(bmd.rect, 0);
 				
 				var matrix:Matrix = mc.transform.matrix;
-				var rect:Rectangle = mc.getBounds(theStage);
+				var rect:Rectangle = mc.getBounds(rootClip);
 				/* Apply a translation to the Matrix object using the x and y property of the Rectangle (bounding box) object */
 				matrix.translate(-rect.x, -rect.y);
 				bmd.draw(mc, matrix);
