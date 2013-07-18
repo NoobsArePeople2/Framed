@@ -100,6 +100,66 @@ framer.frame();
 // framer.frame('myCustomFileName.zip');
 ```
 
+### Auto Saving
+
+Choosing where you want to save and clicking a bunch of buttons each and every time you export your animations gets annoying rather quickly. You can keep your annoyance at locked away by using auto-save! Simply pass in the `Framed.AUTO_SAVE_ON` parameter to the `frame()` method and you'll be ... not automatically auto-saving. There is some initial setup.
+
+Auto-saving requires you to first manually select where you want to save for two reasons. First, auto-saving will also auto-trash anything that lives at the auto-save destination. Manually selecting the auto-save location helps avoid accidentally obliterating a bunch of work (fear not! when trashing work Framed moves it to the trash/recycle bin so it should be retrievable). Second, manually selecting the auto-save destination allows Framed to spit out the path for you so you can just copy-paste it into your code.
+
+Here's an auto-save example using Stage framing:
+
+```
+import framed.Framed;
+import framed.StageFramer;
+
+var framer:StageFramer = new StageFramer(this, frame);
+framer.frame('data.zip', Framed.AUTO_SAVE_ON);
+```
+
+The first time you run this you'll notice nothing different from the non-auto-save version: You still have to select your save location and hit a few buttons to save your file. Switching to the Output tab in Flash there will be a line that looks similar to this:
+
+```
+Saving to 'file:///E:/path/to/data.zip'
+```
+
+Select and copy the part between the single quotes (in the above example this would be `file:///E:/path/to/data.zip`) and paste that into your Actionscript code for file name. Your call to the `frame()` method will now look like this:
+
+```
+framer.frame('file:///E:/path/to/data.zip', Framed.AUTO_SAVE_ON);
+```
+
+Now when you run your animation it will auto-save to the location you selected.
+
+### File Export
+
+Exporting a zip archive of all your frames isn't always convenient. It might be nicer to just export all of the files individually to a folder. With File Export you can do this. To use file export simply specify a directory for the file name rather than a zip archive:
+
+```
+framer.frame('file:///E:/path/to/folder');
+```
+
+File Export even works with auto-save:
+
+```
+framer.frame('file:///E:/path/to/folder', Framed.AUTO_SAVE_ON);
+```
+
+### Watch Files
+
+The goal of Framed is to automate boring, repetitive work as much as possible so you can get your animations from Flash into your game quickly and easily. However, in most cases the output from Framed isn't ready to be plopped into a game. You might need to resize or rename the images, or drop them into a texture atlas. All of these things are outside the scope of Framed but Framed does provide a mechanism for hooking into an asset pipeline: watch files.
+
+Watch files are specific files that a task runner tool (e.g., [Grunt](http://gruntjs.com/)) watches for changes. When a watch file is changed the task runner executes a specific action or series of actions. When using File Export you can also choose to export a watch file:
+
+```
+framer.frame('file:///E:/path/to/folder', Framed.AUTO_SAVE_ON, Framed.WRITE_WATCH_FILE_ON);
+```
+
+This writes a file called `framed-watch-file.txt` in the same folder as the exported PNG frames. The watch file is a UTF-8 encoded plain text file that contains two lines, in this order:
+
+1. The [absolute URL](http://help.adobe.com/en_US/AIR/1.5/devappshtml/WS5b3ccc516d4fbf351e63e3d118666ade46-7fe4.html#WS5b3ccc516d4fbf351e63e3d118666ade46-7d9e) to the export folder
+2. The [Unix timestamp](http://en.wikipedia.org/wiki/Unix_time) as milliseconds when the file was written. [See also](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Date.html#getTime(\))
+
+
 ## Supported Flash Versions
 
 The following are the supported versions (read: I've used Framed with these) of Flash. Framed will probably work with other versions of Flash (<a href="mailto:hello@seanmonahan.org?subject=Framed">let me know!</a>) but I have no way of knowing that.
@@ -113,6 +173,7 @@ Framed is built with Flash Builder 4.7. You should be able to use any version of
   - [as3corelib](https://github.com/mikechambers/as3corelib/) `images` package. Source files included in repo.
   - [nochump zip](http://nochump.com/blog/archives/15). SWC included in repo.
   - [Flex 4.0A SDK](http://sourceforge.net/adobe/flexsdk/wiki/Download%20Flex%204/). Download this guy separately.
+  - [Adobe AIR SDK](http://www.adobe.com/devnet/air/air-sdk-download.html). Download and install this into your Flex 4.0A folder.
 
 1. Once you have all the dependencies [add the Flex 4.0A SDK to Flash Builder](http://help.adobe.com/en_US/Flex/4.0/UsingFlashBuilder/WSbde04e3d3e6474c4-fb4ed5124020245e3-7ff8.html).
 2. Next select File > New > Flex Library Project.
@@ -120,6 +181,7 @@ Framed is built with Flash Builder 4.7. You should be able to use any version of
   - "Framed" for the Project Name
   - Point Project Location to the root of this repo.
   - Select "Flex 4.0A" for the Flex SDK Version
+  - Tick the box labeld "Include Adobe AIR libraries".
   - Click Next.
   - Under the Library Path tab click "Add SWC Folder". In the dialog that appears enter "libs". Click OK.
   - Click Finish.
