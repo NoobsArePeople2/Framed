@@ -221,9 +221,20 @@ package framed
 		private function deleteFilesAtUrl(url:String):void
 		{
 			var f:File = new File(url);
-			if (f.exists)
+			if (f.exists && f.isDirectory)
 			{
-				f.moveToTrash();
+				var files:Array = f.getDirectoryListing();
+				var file:File;
+				var len:int = files.length;
+				for (var i:int = 0; i < len; ++i)
+				{
+					file = files[i];
+					if (Util.fileIsPng(decodeURI(file.url)))
+					{
+						file.moveToTrash();
+					}
+				}
+//				f.moveToTrash();
 			}
 		}
 		
@@ -319,7 +330,18 @@ package framed
 		 */
 		public static function fileIsZip(file:String):Boolean
 		{
-			return file.substring(file.lastIndexOf('.') + 1) == 'zip';
+			return file.toLowerCase().substring(file.lastIndexOf('.') + 1) == 'zip';
+		}
+		
+		/**
+		 * Checks if the file has a 'png' extenstion.
+		 * 
+		 * @param file File name to test.
+		 * @return <code>true</code> if the file has a 'png' extension.
+		 */
+		public static function fileIsPng(file:String):Boolean
+		{
+			return file.toLowerCase().substring(file.lastIndexOf('.') + 1) == 'png';
 		}
 		
 		/**
